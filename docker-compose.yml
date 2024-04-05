@@ -1,0 +1,38 @@
+version: '3.7'
+
+services:
+  wordpress:
+    build: .
+    depends_on:
+      - db
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+      # Additional environment variables like WP_HOME and WP_SITEURL can be added here
+      # WP_ENV, AUTH_KEY, SECURE_AUTH_KEY, etc., as needed.
+    volumes:
+      - ./web/app/uploads:/var/www/html/web/app/uploads  # Ensure uploads are persistent
+    ports:
+      - "8000:80"  # Map port 8000 on the host to port 80 in the container
+
+  db:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+      MYSQL_ROOT_PASSWORD: rootpassword
+    volumes:
+      - db_data:/var/lib/mysql
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"
+
+volumes:
+  db_data:
